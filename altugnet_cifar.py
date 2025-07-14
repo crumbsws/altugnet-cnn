@@ -64,12 +64,14 @@ class ImageClassifier(nn.Module):
         x = self.fc_layers(x)
         return x
 
+classifier = ImageClassifier().to(device)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #add code here to check 'ıf model_state.pt, exısts then just load the model
 def trainModel():
   if not os.path.exists('model_state_cifar.pt'):
     # Create an instance of the image classifier model
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    classifier = ImageClassifier().to(device)
+
+    
 
     # Define the optimizer and loss function
     optimizer = Adam(classifier.parameters(), lr=0.001)
@@ -88,7 +90,7 @@ def trainModel():
             optimizer.step()  # Update weights
 
         loss_list.append(loss.item())
-        print(f"Epoch:{epoch} loss is {loss.item()}")
+        print(Fore.YELLOW + f"Epoch:{epoch} loss is {loss.item()}")
         if epoch > 0:
           print(Fore.YELLOW +  f"Comparing old loss to the new one: {loss_list[epoch - 1] - loss_list[epoch]} ")
         print(Fore.YELLOW + '--------------------------------------')
@@ -97,12 +99,11 @@ def trainModel():
     torch.save(classifier.state_dict(), 'model_state_cifar.pt')
 
   else:
-    classifier = ImageClassifier()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    classifier.to(device)
+
     # Load the saved model
     with open('model_state_cifar.pt', 'rb') as f:
       classifier.load_state_dict(load(f))
+
 
 
 def testDatasetClassification():
@@ -148,7 +149,8 @@ def testAdversarialClassification():
       images.requires_grad = True
 
       non_altered_example_img = images
-
+      pre_adv_true_label = labels.item()
+       
 
       outputs_OG = classifier(images)  # Forward pass
       loss_fn = nn.CrossEntropyLoss()
@@ -170,7 +172,7 @@ def testAdversarialClassification():
       _, adv_predicted = torch.max(outputs_adv, 1)
       non_altered_example_label = adv_predicted.item()
       adv_total = labels.size(0)
-      
+      post_adv_false_label = adv_predicted.item()
       adv_correct = (adv_predicted == labels).sum().item()
       adv_accuracy = adv_correct / adv_total
       second_test_accuracy_list.append(adv_accuracy)
@@ -178,16 +180,23 @@ def testAdversarialClassification():
 
 
       images.grad.zero_()
+  
+
+
   print(Fore.RED + f"Resultant accuracy from the adversarial attack: {sum(second_test_accuracy_list) / len(second_test_accuracy_list)}")
 
-  print(Fore.GREEN + f"Original Image Example: {cifar10_labels[non_altered_example_label]} \n")
-  plt.imshow(non_altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
-  plt.show()
 
-  print('')
+  fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 
-  print(Fore.GREEN + f"Altered Image Example: {cifar10_labels[non_altered_example_label]} \n")
-  plt.imshow(altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
+  axs[0].imshow(non_altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
+  axs[0].set_title(cifar10_labels[pre_adv_true_label])
+  axs[0].axis('off')
+
+  axs[1].imshow(altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
+  axs[1].set_title(cifar10_labels[post_adv_false_label])
+  axs[1].axis('off')
+
+  plt.tight_layout()
   plt.show()
 
 
@@ -199,24 +208,31 @@ def testAdversarialClassification():
 #then store the gradıent wrt x usıng grad = x.grad
 # x_adv = x + epsılon* sıng(grad)
 
+print(Fore.LIGHTGREEN_EX + """
+        _ _                          _   
+       | | |                        | |  
+   __ _| | |_ _   _  __ _ _ __   ___| |_ 
+  / _` | | __| | | |/ _` | '_ \ / _ \ __|
+ | (_| | | |_| |_| | (_| | | | |  __/ |_ 
+  \__,_|_|\__|\__,_|\__, |_| |_|\___|\__|
+                     __/ |               
+                    |___/                
+""")
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Model training/testing script")
-    parser.add_argument('--train', action='store_true', help='Run training')
-    parser.add_argument('--test', action='store_true', help='Run testing')
-    parser.add_argument('--aa', action='store_true', help='Run attack')
-
-
-    args = parser.parse_args(args=[])
-
-    if args.train:
-        trainModel()
-
-    if args.test:
-        testDatasetClassification()
-    if args.aa:
-        testAdversarialClassification()
+while True:
+  trainModel()
+  print(Fore.LIGHTGREEN_EX + "Type test or aa to continue: ")
+  command = input()
+  if(command == "test"):
+    print(Fore.LIGHTGREEN_EX +  "Testing model")
+    testDatasetClassification()
+    print(Fore.LIGHTGREEN_EX + "\nModel tested"  +  Fore.RESET) 
+  elif(command == "aa"):
+    print(Fore.LIGHTGREEN_EX + "Testing adversarial attack")
+    testAdversarialClassification()
+    print(Fore.LIGHTGREEN_EX + "\nAdversarial attack complete" +  Fore.RESET)
+  else:
+    print("Invalid command")
 
 
 # Perform inference on an image
