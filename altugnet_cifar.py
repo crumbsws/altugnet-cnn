@@ -25,8 +25,8 @@ cifar10_labels = [
     "airplane",
     "automobile",
     "bird",
-    "deer",
     "cat",
+    "deer",
     "dog",
     "frog",
     "horse",
@@ -171,6 +171,7 @@ def testAdversarialClassification():
 
       #now lets actually compute test accuracy
       _, adv_predicted = torch.max(outputs_adv, 1)
+      _, actual_predicted = torch.max(outputs_OG, 1)
       non_altered_example_label = adv_predicted.item()
       adv_total = labels.size(0)
       post_adv_false_label = adv_predicted.item()
@@ -190,7 +191,7 @@ def testAdversarialClassification():
   fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 
   axs[0].imshow(non_altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
-  axs[0].set_title(cifar10_labels[pre_adv_true_label])
+  axs[0].set_title(cifar10_labels[actual_predicted])
   axs[0].axis('off')
 
   axs[1].imshow(altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
