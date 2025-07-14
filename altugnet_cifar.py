@@ -134,8 +134,6 @@ def testDatasetClassification():
 
 
 
-
-
 def testAdversarialClassification():
   second_test_accuracy_list = []
   altered_example_img = None
@@ -185,7 +183,73 @@ def testAdversarialClassification():
   
 
 
-  print(Fore.RED + f"Resultant accuracy from the adversarial attack: {sum(second_test_accuracy_list) / len(second_test_accuracy_list)}")
+  print(Fore.RED + f"Resultant accuracy from the adversarial attack: {sum(second_test_accuracy_list) / len(second_test_accuracy_list)} ({cifar10_labels[pre_adv_true_label]})")
+
+
+  fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+
+  axs[0].imshow(non_altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
+  axs[0].set_title(cifar10_labels[actual_predicted])
+  axs[0].axis('off')
+
+  axs[1].imshow(altered_example_img.squeeze().cpu().detach().permute(1, 2, 0).numpy())
+  axs[1].set_title(cifar10_labels[post_adv_false_label])
+  axs[1].axis('off')
+
+  plt.tight_layout()
+  plt.show()
+
+
+
+
+def testTargetedAdversarialClassification():
+  second_test_accuracy_list = []
+  altered_example_img = None
+  non_altered_example_img = None
+  non_altered_example_label = None
+
+  for images, labels in test_loader:
+
+
+      images, labels = images.to(device), labels.to(device)
+      images.requires_grad = True
+
+      non_altered_example_img = images
+      pre_adv_true_label = labels.item()
+       
+
+      outputs_OG = classifier(images)  # Forward pass
+      first_output_neuron = outputs_OG[0, 0]
+      first_output_neuron.backward()
+      grad_adv = images.grad
+      epsilon = 0.1
+
+
+      #take sıgn of each element
+      grad_adv = torch.sign(grad_adv)
+      x_adv = images + epsilon * grad_adv
+      altered_example_img = x_adv
+
+      outputs_adv = classifier(x_adv)  # Forward pass
+      correct_label= labels.item()
+
+      #now lets actually compute test accuracy
+      _, adv_predicted = torch.max(outputs_adv, 1)
+      _, actual_predicted = torch.max(outputs_OG, 1)
+
+      adv_total = labels.size(0)
+      post_adv_false_label = adv_predicted.item()
+      adv_correct = (adv_predicted == labels).sum().item()
+      adv_accuracy = adv_correct / adv_total
+      second_test_accuracy_list.append(adv_accuracy)
+
+
+
+      images.grad.zero_()
+  
+
+
+  print(Fore.RED + f"Resultant accuracy from the adversarial attack: {sum(second_test_accuracy_list) / len(second_test_accuracy_list)} ({cifar10_labels[pre_adv_true_label]})")
 
 
   fig, axs = plt.subplots(1, 2, figsize=(10, 5))
