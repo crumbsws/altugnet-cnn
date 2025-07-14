@@ -64,8 +64,9 @@ class ImageClassifier(nn.Module):
         x = self.fc_layers(x)
         return x
 
-classifier = ImageClassifier().to(device)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+classifier = ImageClassifier().to(device)
+
 #add code here to check 'ıf model_state.pt, exısts then just load the model
 def trainModel():
   if not os.path.exists('model_state_cifar.pt'):
@@ -221,6 +222,7 @@ print(Fore.LIGHTGREEN_EX + """
 
 while True:
   trainModel()
+  print(Fore.LIGHTGREEN_EX + "Training complete")
   print(Fore.LIGHTGREEN_EX + "Type test or aa to continue: ")
   command = input()
   if(command == "test"):
