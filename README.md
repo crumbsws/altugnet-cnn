@@ -1,32 +1,29 @@
-🧠 Number Image Classifier & Adversarial Attack Generator
+ 🧠 CIFAR-10 Image Classifier with Adversarial Testing (PyTorch)
 
-This repository contains a PyTorch-based deep learning project that trains a neural network to classify handwritten digit images (e.g., MNIST), and demonstrates adversarial attacks (e.g., FGSM) that exploit model vulnerabilities by subtly modifying inputs to fool the classifier.
-🔍 Project Overview
+This project is a convolutional neural network (CNN) built using PyTorch that classifies images from the CIFAR-10 dataset. It includes:
 
-    Image Classifier
-    A convolutional neural network (CNN) that learns to classify digit images from the MNIST dataset.
+    A custom CNN model
 
-    Adversarial Attack Generator
-    Implementation of the Fast Gradient Sign Method (FGSM) to generate adversarial examples that reduce classification accuracy.
+    Automatic training and model persistence
 
-📂 Contents
+    Standard testing on unseen data
 
-.
-├── classifier.py         # Model definition & training
-├── attack.py             # Adversarial attack logic
-├── test.py               # Evaluation on clean and adversarial data
-├── utils.py              # Utility functions for visualization, loading, etc.
-├── README.md             # Project documentation
-└── requirements.txt      # Required dependencies
+    Simple adversarial attack using FGSM (Fast Gradient Sign Method)
 
-🧪 Features
+    Command-line based interactive testing
 
-    Simple, modular CNN architecture for number classification
+📦 Features
 
-    Training and testing on MNIST dataset
+    Loads CIFAR-10 with torchvision
 
-    Adversarial attack implementation (FGSM)
+    Builds a CNN from scratch
 
-    Accuracy comparison between clean and adversarial inputs
+    Trains the model from scratch or loads it from disk
 
-    Visual inspection of perturbed images
+    Evaluates model on test dataset
+
+    Applies adversarial perturbations to test robustness
+
+    Uses colorama for colored terminal output
+
+    Displays visual comparison between clean and adversarial images
