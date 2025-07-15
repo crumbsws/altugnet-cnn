@@ -72,7 +72,7 @@ def trainModel():
   if not os.path.exists('model_state_cifar.pt'):
     # Create an instance of the image classifier model
 
-    
+
 
     # Define the optimizer and loss function
     optimizer = Adam(classifier.parameters(), lr=0.001)
@@ -130,7 +130,7 @@ def testDatasetClassification():
     print(Fore.YELLOW + f"Average test loss: {avg_test_loss}")
 
     # Make sure second_test_accuracy_list is defined before this line
-  
+
 
 
 
@@ -149,7 +149,7 @@ def testAdversarialClassification():
 
       non_altered_example_img = images
       pre_adv_true_label = labels.item()
-       
+
 
       outputs_OG = classifier(images)  # Forward pass
       loss_fn = nn.CrossEntropyLoss()
@@ -180,7 +180,7 @@ def testAdversarialClassification():
 
 
       images.grad.zero_()
-  
+
 
 
   print(Fore.RED + f"Resultant accuracy from the adversarial attack: {sum(second_test_accuracy_list) / len(second_test_accuracy_list)} ({cifar10_labels[pre_adv_true_label]})")
@@ -216,7 +216,7 @@ def testTargetedAdversarialClassification():
 
       non_altered_example_img = images
       pre_adv_true_label = labels.item()
-       
+
 
       outputs_OG = classifier(images)  # Forward pass
       first_output_neuron = outputs_OG[0, 0]
@@ -246,7 +246,7 @@ def testTargetedAdversarialClassification():
 
 
       images.grad.zero_()
-  
+
 
 
   print(Fore.RED + f"Resultant accuracy from the adversarial attack: {sum(second_test_accuracy_list) / len(second_test_accuracy_list)} ({cifar10_labels[pre_adv_true_label]})")
@@ -275,14 +275,14 @@ def testTargetedAdversarialClassification():
 # x_adv = x + epsılon* sıng(grad)
 
 print(Fore.LIGHTGREEN_EX + """
-        _ _                          _   
-       | | |                        | |  
-   __ _| | |_ _   _  __ _ _ __   ___| |_ 
+        _ _                          _
+       | | |                        | |
+   __ _| | |_ _   _  __ _ _ __   ___| |_
   / _` | | __| | | |/ _` | '_ \ / _ \ __|
- | (_| | | |_| |_| | (_| | | | |  __/ |_ 
+ | (_| | | |_| |_| | (_| | | | |  __/ |_
   \__,_|_|\__|\__,_|\__, |_| |_|\___|\__|
-                     __/ |               
-                    |___/                
+                     __/ |
+                    |___/
 """)
 
 while True:
@@ -293,7 +293,7 @@ while True:
   if(command == "test"):
     print(Fore.LIGHTGREEN_EX +  "Testing model")
     testDatasetClassification()
-    print(Fore.LIGHTGREEN_EX + "\nModel tested"  +  Fore.RESET) 
+    print(Fore.LIGHTGREEN_EX + "\nModel tested"  +  Fore.RESET)
   elif(command == "aa"):
     print(Fore.LIGHTGREEN_EX + "Testing adversarial attack")
     testAdversarialClassification()
